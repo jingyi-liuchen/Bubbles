@@ -1,5 +1,5 @@
-# Project Title
-This program Bubbles reads in lammps trajectory file and (optionally) output the following:   
+# Bubbles
+This program reads in lammps trajectory file and (optionally) output the following:   
 (1) number, size, and shape anisotropy factor for bubbles (void clusters);  
 (2) shell density, temperature, and radial velocity profile;  
 (3) 3D field data of density, temperature and velocity.  
