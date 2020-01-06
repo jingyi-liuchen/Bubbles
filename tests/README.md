@@ -20,8 +20,8 @@ rcut: distance for defining nearest neighbor (ansgtrom)
 lshell: whether to calculate shell density, temperature, radial velocity profile  
 del: 0: constant distance binning 1: constant volume binning 2: constant atom number binning  
 nshell: number of shells  
-delr: value of constant distance used when del = 0   (angstrom)
-delv: value of constant volume used when del = 1  (angstrom^3)
+delr: value of constant distance used when del = 0 (angstrom)  
+delv: value of constant volume used when del = 1 (angstrom^3)  
 deln: value of constant atom number used when del = 2  
 
 ### FIELD
