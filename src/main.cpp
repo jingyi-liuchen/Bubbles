@@ -45,22 +45,22 @@ int main(int argc, char** argv)
         read_count -= MPI_Wtime();
         frame->read_head();
         frame->read_atom();
-        printf("finish reading atom\n");
+        //printf("finish reading atom\n");
         read_count += MPI_Wtime();
 
         bubble_count -= MPI_Wtime();
         frame->bubble->cal_bubble(outbubble);
-        printf("finish cal bubble\n");
+        //printf("finish cal bubble\n");
         bubble_count += MPI_Wtime();
 
         shell_count -= MPI_Wtime();
         frame->shell->cal_shell(outshell);
-        printf("finish cal shell\n");
+        //printf("finish cal shell\n");
         shell_count += MPI_Wtime();
 
         field_count -= MPI_Wtime();
         frame->field->cal_field(outfield);
-        printf("finish cal field\n");
+        //printf("finish cal field\n");
         field_count += MPI_Wtime();
 
         frame->atom->cleanup_atom();

@@ -464,6 +464,10 @@ void Shell::cal_shellr_deln()
             {
                 printf("Error in dividing inner shells! Likely Resolution not high enough!\n");
                 printf("ninner:%d nshell_high:%d\n",ninner,nshell_high);
+                for(int i=0;i<nshell;i++)
+                {
+                    printf("%d\n",hist[i]);
+                }
                 exit(1);
             }
         }
