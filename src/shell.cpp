@@ -460,8 +460,12 @@ void Shell::cal_shellr_deln()
 
         if(ncount==0) //something is wrong, didnt find any new boundary
         {
-            printf("Error in dividing inner shells! Likely Resolution not high enough!\n");
-            exit(1);
+            if(myid==0)
+            {
+                printf("Error in dividing inner shells! Likely Resolution not high enough!\n");
+                printf("ninner:%d nshell_high:%d\n",ninner,nshell_high);
+                exit(1);
+            }
         }
 
         for(int i=1;i<ncount+1;i++)
