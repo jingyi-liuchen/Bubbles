@@ -13,7 +13,7 @@ MPI and Eigen library (http://eigen.tuxfamily.org) is required for compiling.
 
 ## Installing
 
-Adapt Makefile to change c++ compilers (default:mpiicpc) and path of Eigen library (default:../)  
+Adapt Makefile to change c++ compilers and path of Eigen library  
 
 ```
 cd Bubbles
