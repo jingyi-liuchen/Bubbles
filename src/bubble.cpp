@@ -142,12 +142,15 @@ int Bubble::cal_molty(int imol, int& id_1D)
     for(int i=-nlayer[0];i<=nlayer[0];i++)
     {
         id_3D_neigh[0] = id_3D[0] + i;
+        id_pbc(id_3D_neigh[0],ncellx[0]);
         for(int j=-nlayer[1];j<=nlayer[1];j++)
         {
             id_3D_neigh[1] = id_3D[1] + j;
+            id_pbc(id_3D_neigh[1],ncellx[1]);
             for(int k=-nlayer[2];k<=nlayer[2];k++)
             {
                 id_3D_neigh[2] = id_3D[2] + k;
+                id_pbc(id_3D_neigh[2],ncellx[2]);
                 id_1D_neigh = mapto1D(id_3D_neigh,ncellx);
                 int nmol = nicell[id_1D_neigh];
                 for(int m=0;m<nmol;m++)

@@ -1,7 +1,7 @@
-CXX = mpiicpc
+CXX = mpic++
 LIBS = ../eigen-git-mirror/Eigen/
 
-CXXFLAGS =  -g -std=c++11 
+CXXFLAGS =  -O2 -std=c++11 
 CXXFLAGS += -I $(LIBS)
 
 OBJDIR=obj

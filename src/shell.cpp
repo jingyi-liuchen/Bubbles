@@ -442,15 +442,18 @@ void Shell::cal_shellr_deln()
         for(int i=0;i<ninner;i++)
         {
             int shellid = static_cast<int>((inner_dist[i]-rmin)/delr);
-            if(shellid>=0 && shellid<=nshell_high-1)  hist[shellid]++;
+            if(shellid>=0 && shellid<=nshell_high-1)  
+                hist[shellid]++;
         }
 
         int period_sum = 0, ncount=0, end_shell, *bounds;
         allocate_1D<int>(bounds,nshell_high,"bounds");
-        for(int i=0;i<nshell;i++)
+        for(int i=0;i<nshell_high;i++)
         {
-            if(hist[i] > high_bound) break;
+            if(hist[i] > high_bound) 
+                break;
             period_sum += hist[i];
+
             if (period_sum >= low_bound && period_sum <=high_bound)
             {
                 bounds[ncount++] = i;
@@ -463,11 +466,7 @@ void Shell::cal_shellr_deln()
             if(myid==0)
             {
                 printf("Error in dividing inner shells! Likely Resolution not high enough!\n");
-                printf("ninner:%d nshell_high:%d\n",ninner,nshell_high);
-                for(int i=0;i<nshell;i++)
-                {
-                    printf("%d\n",hist[i]);
-                }
+                printf("rmax:%10.5e rmin:%10.5e ninner:%d nshell_high:%d lowb:%d highb:%d\n",rmax,rmin,ninner,nshell_high,low_bound,high_bound);
                 exit(1);
             }
         }
