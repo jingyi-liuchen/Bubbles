@@ -73,17 +73,17 @@ void::Shell::cal_shellprop()
     class Molecule* all_molecule = frame->input->sys_pars->all_molecule;
     int* type = frame->atom->type;
 
-    int** shellnum_local;
-    double **shellvcm_local, **shellvcm, *shellmass_local, *shellmass, *shellT_local, *shellvr_local;
-    int* shellid;
+    int** shellnum_local=NULL;
+    double **shellvcm_local=NULL, **shellvcm=NULL, *shellmass_local=NULL, *shellmass=NULL, *shellT_local=NULL, *shellvr_local=NULL;
+    int* shellid=NULL;
 
     allocate_1D<int>(shellid,nlocal,"shellid");
     allocate_2D<int>(shellnum,nshell,nmolty,"shellnum");
     allocate_2D<int>(shellnum_local,nshell,nmolty,"shellnum_local");
 
-    for(int i=0;i<nmolty;i++)
+    for(int i=0;i<nshell;i++)
     {
-        for(int j=0;j<nshell;j++)
+        for(int j=0;j<nmolty;j++)
         {
             shellnum_local[i][j] = 0;
         } 
@@ -232,15 +232,16 @@ void::Shell::cal_shellprop()
         }
     }
 
-    free_2D<int>(shellnum_local);
-    free_1D<double>(shellT_local);
-    free_1D<double>(shellmass_local);
-    free_1D<double>(shellmass);
-    free_2D<double>(shellvcm);
-    free_2D<double>(shellvcm_local);
-    free_1D<double>(shellvr_local);
     free_1D<int>(shellid);
-}
+    free_2D<int>(shellnum_local);
+
+    if(shellT_local)     free_1D<double>(shellT_local);
+    if(shellmass_local)  free_1D<double>(shellmass_local);
+    if(shellmass)        free_1D<double>(shellmass);
+    if(shellvcm)         free_2D<double>(shellvcm);
+    if(shellvcm_local)   free_2D<double>(shellvcm_local);
+    if(shellvr_local)    free_1D<double>(shellvr_local);
+} 
 
 int Shell:: cal_shellid(double dist)
 {
