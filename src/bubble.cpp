@@ -587,8 +587,8 @@ void Bubble:: cal_kappa(const int* sortid)
     if(realncut==0)  return;
     
     int* mesh = frame->input->bubble_pars->bubble_mesh;
-    double  xzratio = mesh[0]/mesh[2]; //correct for using reduced coordinates
-    double  yzratio = mesh[1]/mesh[2];
+    double  xzratio = static_cast<double>(mesh[0])/mesh[2]; //correct for using reduced coordinates
+    double  yzratio = static_cast<double>(mesh[1])/mesh[2];
     double  meshsize[3], reboxlo[3] = {0.,0.,0.},reboxlen[3] = {1.,1.,1.};
 
     allocate_1D<double>(kappa,realncut,"kappa");
@@ -643,6 +643,7 @@ void Bubble:: cal_kappa(const int* sortid)
         gyraT(1,0) = gyraT(0,1);
         gyraT(2,0) = gyraT(0,2);
         gyraT(2,1) = gyraT(1,2);
+
         EigenSolver<MatrixXd> es(gyraT,false);
         lambda1 = (es.eigenvalues())[0].real();
         lambda2 = (es.eigenvalues())[1].real();
