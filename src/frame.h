@@ -48,8 +48,8 @@ class Frame
     int best_factors(int npossible, int **factors, int *best);
 
     //read trajectory file and set local atom information
-    void read_head();
-    void read_atom();
+    int read_head();
+    int read_atom();
     void set_atom_info(int nline, char* buf);
 
     private:

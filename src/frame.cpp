@@ -129,13 +129,12 @@ void Frame:: set_procgrid()
 
 //read head part of one frame
 //all information in domain is updated
-void Frame:: read_head()
+int Frame:: read_head()
 {
-    int read_error, m;
+    int read_error = 0, m;
     char buf[MAXLEN];
     if(myid==0)
     {
-        read_error = 0;
         m = 0;
         int nline = 0;
         while(fgets(&buf[m],MAXLEN,intraj)!=NULL)
@@ -154,10 +153,12 @@ void Frame:: read_head()
         {
             read_error = 1;
             printf("Error in reading head! \n");
-            exit(1);
         }
     }
 
+    MPI_Bcast(&read_error,1,MPI_INT,0,MPI_COMM_WORLD);
+    if(read_error)
+        return 1;
     MPI_Bcast(&m,1,MPI_INT,0,MPI_COMM_WORLD);
     MPI_Bcast(buf,m,MPI_CHAR,0,MPI_COMM_WORLD);
 
@@ -191,7 +192,7 @@ void Frame:: read_head()
         {
             printf("Number of atoms not consistent!\n");
         }
-        exit(1);
+        return 1;
     }
 
     //line 6,7,8 box boundary 
@@ -218,13 +219,14 @@ void Frame:: read_head()
          domain->sublo[i] = domain->boxlo[i] + mycor[i]*domain->sublen[i];
          domain->subhi[i] = domain->sublo[i] + domain->sublen[i];
      }
+     return 0;
 }
 
 //read atom information from one frame
-void Frame:: read_atom()
+int Frame:: read_atom()
 {
     char buf[MAXLINE*CHUNK];
-    int nchunk, nread;
+    int nchunk, nread, read_error = 0;
 
     atom->init();           //allocate memory for local atoms
 
@@ -242,7 +244,8 @@ void Frame:: read_atom()
                 if(!fgets(&buf[m],MAXLINE,intraj))
                 {
                     printf("Abnormal end in reading atoms\n");
-                    exit(1);
+                    read_error = 1;
+                    break;
                 }
                 m += strlen(&buf[m]);
             }
@@ -252,6 +255,9 @@ void Frame:: read_atom()
             }
         }
 
+        MPI_Bcast(&read_error,1,MPI_INT,0,MPI_COMM_WORLD);
+        if(read_error)
+            return 1;
         MPI_Bcast(&m,1,MPI_INT,0,MPI_COMM_WORLD);
         MPI_Bcast(buf,m,MPI_CHAR,0,MPI_COMM_WORLD);
         set_atom_info(nchunk,buf);
@@ -267,8 +273,9 @@ void Frame:: read_atom()
         {
             printf("Local number of atoms doenst adds up to correct number! %d != %d\n",sum,atom->natoms);
         }
-        exit(1);
+        return 1;
     }
+    return 0;
 }
 
 void Frame::set_atom_info(int nline, char* buf)
