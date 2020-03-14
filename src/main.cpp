@@ -42,9 +42,14 @@ int main(int argc, char** argv)
 
     for(int iframe=0; iframe<maxframe; iframe++)
     {
+        int head_error, atom_error;
         read_count -= MPI_Wtime();
-        frame->read_head();
-        frame->read_atom();
+        head_error = frame->read_head();
+        atom_error = frame->read_atom();
+        if(head_error || atom_error)
+        {
+            break;
+        }
         if(myid==0) printf("finish reading atom\n");
         read_count += MPI_Wtime();
 
