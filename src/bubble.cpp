@@ -601,6 +601,11 @@ void Bubble:: cal_kappa(const int* sortid)
     {   
         int id = sortid[i];
         int nmem = clustermem[id].size();
+        if(nmem == 1)
+        {
+            kappa[i] = -1;
+            continue;
+        }
         Matrix3d gyraT;
         double lambda1,lambda2,lambda3,lambda_sum;
 
