@@ -10,6 +10,7 @@ maxfrmae: maximum number of frames to analyze
 ### BUBBLE
 
 lbubble: whether to calculate size, center of mass, shape anisotropy factor (0:no 1:yes)  
+bead\_type: the atom type used for calculating neighbors
 bubble\_mesh: number of meshes used in x, y, z direction  
 ncut: only output information for ncut largest bubbles  
 nliqcut: number of minimum nearest neighbor molecules to be considered as liquid molecule  
