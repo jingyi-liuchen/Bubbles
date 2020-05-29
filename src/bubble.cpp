@@ -66,6 +66,7 @@ void Bubble::cal_bubble(FILE* outbubble)
 void Bubble::set_linkcell()
 {
     int* mesh = frame->input->bubble_pars->bubble_mesh;
+    int bead_type = frame->input->bubble_pars->bead_type;
     double** x = frame->atom->x;
     int nlocal  = frame->atom->nlocal;
     double rcut = frame->input->bubble_pars->rcut;
@@ -103,7 +104,7 @@ void Bubble::set_linkcell()
     {
         int atype = frame->atom->type[i];
         int id_3D[3];
-        if(atype != 1) continue;    //only consider water 
+        if(atype != bead_type) continue;    //only consider water 
         for(int j=0;j<3;j++)
         {
             id_3D[j] = static_cast<int>((x[i][j]-sublo[j])/meshsize[j]);
@@ -186,7 +187,8 @@ int Bubble::cal_molty(int imol, int& id_1D)
 void Bubble::cal_cellty()
 {  
     int nliqmol=0, nliqcell=0, nlocal=frame->atom->nlocal, nremote=frame->atom->nremote;
-    int nliqcut = frame->input->bubble_pars->nliqcut, ncell = ncellx[0]*ncellx[1]*ncellx[2];
+    int nliqcut = frame->input->bubble_pars->nliqcut, bead_type = frame->input->bubble_pars->bead_type;
+    int ncell = ncellx[0]*ncellx[1]*ncellx[2];
     int* molty,*remolty,*cellty,*cellnnliq;
     int* mesh = frame->input->bubble_pars->bubble_mesh;
     double** x = frame->atom->x, **xre = frame->atom->xre;
@@ -216,7 +218,7 @@ void Bubble::cal_cellty()
     for(int imol=0;imol<nlocal;imol++)
     {
        int atype = frame->atom->type[imol];
-       if(atype!=1) continue;
+       if(atype!=bead_type) continue;
        int id_1D,imolty;
        imolty = cal_molty(imol,id_1D);
        molty[imol] = imolty;
@@ -237,8 +239,7 @@ void Bubble::cal_cellty()
     for(int imol=0;imol<nlocal;imol++)
     {
         int atype = frame->atom->type[imol];
-        if(atype!=1) continue;        
-        if(molty[imol]!=1) continue;
+        if(atype!=bead_type || molty[imol]!=1) continue;
         int id_1D = icell[imol];
         int id_3D[3], id_3D_neigh[3];
         mapto3D(id_1D,id_3D,ncellx);
