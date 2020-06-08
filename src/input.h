@@ -24,7 +24,7 @@ class Bubble_para
     int bubble_mesh[3],ncut,nliqcut;
     double rcut;
 
-    Bubble_para():lbubble{1,0,0},bead_type{1},bubble_mesh{20,20,20},ncut{1},
+    Bubble_para():lbubble{1,0,0},bubble_mesh{20,20,20},ncut{1},
                   nliqcut{2},rcut{3.3} {}
 };
 
