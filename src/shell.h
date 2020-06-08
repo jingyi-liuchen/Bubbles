@@ -3,11 +3,14 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include<map>
 
 class Shell
 {
     public:
-    int nshell, del, n_inner_shell;
+    int nshell, del, n_inner_shell, natom_type;
+    std::map<int, int> atom_type_map;
+    std::map<int, double> atom_mass_map;
     double cms[3];
     double* shellr, *shellT, *shellvr;
     int** shellnum;

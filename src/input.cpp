@@ -246,8 +246,10 @@ void Input::set_line_para(const char* sec_name, char tokens [16][32], int ntoken
         }
         else if(strcmp(first,"bead_type")==0)
         {
-            assert(ntokens==2);
-            bubble_pars->bead_type = atoi(tokens[1]);
+            for(int i=1;i<ntokens;i++)
+            {
+                (bubble_pars->bead_type).insert(atoi(tokens[i]));
+            }
         }
         else if(strcmp(first,"bubble_mesh")==0)
         {

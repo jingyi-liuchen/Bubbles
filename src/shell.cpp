@@ -20,6 +20,24 @@ Shell::Shell(class Frame* iframe)
     frame = iframe;  
     nshell = frame->input->shell_pars->nshell;
     del = frame->input->shell_pars->del;
+ 
+    int nmolty = frame->input->sys_pars->nmolty;
+    Molecule* molecule_array = frame->input->sys_pars->all_molecule;
+    for(int i=0;i<nmolty;i++)
+    {
+        int nunit = molecule_array[i].nunit;
+        for(int j=0;j<nunit;j++)
+        {
+            int atype = molecule_array[i].atomtype[j];
+            double beadmass = molecule_array[i].beadmass[j];
+            if (atom_type_map.find(atype)==atom_type_map.end())
+            {
+                atom_type_map.insert(std::pair<int, int> (atype, natom_type));
+                atom_mass_map.insert(std::pair<int, double>(atype, beadmass));
+                natom_type++;
+            }       
+        }
+    }
 }
 
 Shell::~Shell()
@@ -78,12 +96,12 @@ void::Shell::cal_shellprop()
     int* shellid=NULL;
 
     allocate_1D<int>(shellid,nlocal,"shellid");
-    allocate_2D<int>(shellnum,nshell,nmolty,"shellnum");
-    allocate_2D<int>(shellnum_local,nshell,nmolty,"shellnum_local");
+    allocate_2D<int>(shellnum,nshell,natom_type,"shellnum");
+    allocate_2D<int>(shellnum_local,nshell,natom_type,"shellnum_local");
 
     for(int i=0;i<nshell;i++)
     {
-        for(int j=0;j<nmolty;j++)
+        for(int j=0;j<natom_type;j++)
         {
             shellnum_local[i][j] = 0;
         } 
@@ -134,12 +152,13 @@ void::Shell::cal_shellprop()
         double distsq = cal_distsq(x[i],cms,boxlen);
         double dist = sqrt(distsq);
         int ishellid  = cal_shellid(dist);   
+        int atype = frame->atom->type[i]; 
         shellid[i] = ishellid;
         if(ishellid < nshell)
         {
-            int molty = type[i];
-            shellnum_local[ishellid][molty-1]++;
-            double beadmass = all_molecule[molty-1].beadmass[0];
+            int index = atom_type_map.at(atype);
+            shellnum_local[ishellid][index]++;
+            double beadmass = atom_mass_map.at(atype);
             if(lshell[1])
             {
                 shellvcm_local[ishellid][0] += beadmass * v[i][0];
@@ -161,7 +180,7 @@ void::Shell::cal_shellprop()
         }
     }
 
-    MPI_Allreduce(shellnum_local[0],shellnum[0],nmolty*nshell,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(shellnum_local[0],shellnum[0],natom_type*nshell,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
 
     //calculate shell temperature
     if(lshell[1])
@@ -182,11 +201,11 @@ void::Shell::cal_shellprop()
          for(int i=0;i<nlocal;i++)
          {
              int ishellid = shellid[i];
+             int atype = frame->atom->type[i];
              if(ishellid < nshell)
              {
                  double vx_sub, vy_sub, vz_sub;
-                 int molty = type[i];                
-                 double beadmass = all_molecule[molty-1].beadmass[0];
+                 double beadmass = atom_mass_map.at(atype);
                  vx_sub = v[i][0] - shellvcm[ishellid][0];
                  vy_sub = v[i][1] - shellvcm[ishellid][1];
                  vz_sub = v[i][2] - shellvcm[ishellid][2]; 
@@ -199,7 +218,7 @@ void::Shell::cal_shellprop()
          for(int i=0;i<nshell;i++)
          {
              int dof = 0;
-             for(int j=0;j<nmolty;j++)
+             for(int j=0;j<natom_type;j++)
              {
                  dof += shellnum[i][j] * 3;
              }
@@ -516,30 +535,61 @@ void Shell::cleanup_shell()
 
 void Shell::output_shell(FILE* outshell)
 {
-    int nmolty = frame->input->sys_pars->nmolty;
-    fprintf(outshell, "%15.5e ",shellr[0]/2.0);
-    if(shellnum)
+    //print header
+    fprintf(outshell,"radius ");
+    for(std::pair<int,int> item : atom_type_map)
     {
-        for(int j=0;j<nmolty;j++)
-        {
-            fprintf(outshell, "%15d ",shellnum[0][j]);
-        }
+        int atype = item.first;
+        int index = item.second;
+        char name[12] = "type";
+        char atype_string[8];
+        sprintf(atype_string,":%d",atype);
+        strcat(name,atype_string);
+        fprintf(outshell,"%15s", name);
     }
-    if(shellT)   fprintf(outshell, "%15.5e ",shellT[0]);
-    if(shellvr)  fprintf(outshell, "%15.5e\n",shellvr[0]);
- 
 
-    for(int i=1;i<nshell;i++)
+    if(!shellT && !shellvr)
     {
-        fprintf(outshell, "%15.5e ",(shellr[i]+shellr[i-1])/2.0);
-        if(shellnum) 
+        fprintf(outshell,"\n");
+    }
+    else if (shellT && !shellr)
+    {
+        fprintf(outshell, "%15s", "Temp");
+    }
+    else if (shellvr && !shellT)
+    {
+        fprintf(outshell, "%15s\n", "Vr");
+    }
+    else
+    {
+        fprintf(outshell, "%15s", "Temp");
+        fprintf(outshell, "%15s\n", "Vr");
+    }
+
+    for(int i=0;i<nshell;i++)
+    {
+        fprintf(outshell, "%15.5e", shellr[i]);
+        for(std::pair<int,int> item : atom_type_map)
         {
-            for(int j=0;j<nmolty;j++)
-            {
-                fprintf(outshell, "%15d ",shellnum[i][j]);
-            }
+            int index = item.second;
+            fprintf(outshell, "%15d",shellnum[i][index]);
         }
-        if(shellT)   fprintf(outshell, "%15.5e ",shellT[i]);
-        if(shellvr)  fprintf(outshell, "%15.5e\n",shellvr[i]);
+        if(!shellT && !shellvr)
+        {
+            fprintf(outshell,"\n");
+        }
+        else if (shellT && !shellr)
+        {   
+            fprintf(outshell, "%15.5e\n", shellT[i]);
+        }
+        else if (shellvr && !shellT)  
+        { 
+            fprintf(outshell, "%15.5e\n", shellvr[i]);
+        }
+        else
+        {
+            fprintf(outshell, "%15.5e", shellT[i]);
+            fprintf(outshell, "%15.5e\n", shellvr[i]);
+        }
     }
 }

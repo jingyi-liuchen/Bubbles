@@ -3,6 +3,7 @@
 
 #include<cstdio>
 #include<cstdlib>
+#include<set>
 #include "molecule.h"
 #include "frame.h"
 
@@ -19,7 +20,8 @@ class Bubble_para
 {
     public:
     int lbubble[3];
-    int bead_type, bubble_mesh[3],ncut,nliqcut;
+    std::set<int> bead_type;
+    int bubble_mesh[3],ncut,nliqcut;
     double rcut;
 
     Bubble_para():lbubble{1,0,0},bead_type{1},bubble_mesh{20,20,20},ncut{1},
