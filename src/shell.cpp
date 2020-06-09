@@ -206,9 +206,9 @@ void::Shell::cal_shellprop()
              {
                  double vx_sub, vy_sub, vz_sub;
                  double beadmass = atom_mass_map.at(atype);
-                 vx_sub = v[i][0];
-                 vy_sub = v[i][1];
-                 vz_sub = v[i][2]; 
+                 vx_sub = v[i][0] - shellvcm[ishellid][0];
+                 vy_sub = v[i][1] - shellvcm[ishellid][1];
+                 vz_sub = v[i][2] - shellvcm[ishellid][2]; 
                  shellT_local[ishellid] += beadmass * (vx_sub*vx_sub + vy_sub*vy_sub + vz_sub*vz_sub);
              }
          }
